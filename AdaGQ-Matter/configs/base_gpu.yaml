@@ -1,0 +1,33 @@
+# ===========================================================
+# AdaGQ-Matter — GPU Full Configuration
+# ===========================================================
+# Inherits from base_cpu.yaml, overrides for GPU experiments
+
+dataset: both               # Run both IoTID20 + CICIoT2023
+
+# --- FL Training (Full version) ---
+T: 200                     # Full 200 rounds for convergence curves
+N: 10                      # 10 clients
+eta: 0.01
+E_local: 5
+batch_size: 64             # Larger batch on GPU
+alpha: 0.5
+num_seeds: 5
+seed_range: [1, 2, 3, 4, 5]
+
+# --- Additional: LSTM-AE validation ---
+model_type: dnn             # Default DNN; set "lstm_ae" for larger model
+lstm_hidden_dim: 128
+lstm_num_layers: 2
+
+# --- Paths (数据集与代码分离) ---
+data_dir: /root/datasets/processed
+raw_dir: /root/datasets/raw
+
+# --- Hardware ---
+device: cuda
+num_workers: 2
+
+# --- Extended experiments ---
+run_full_convergence: true
+run_large_model: false      # Set true to also run LSTM-AE

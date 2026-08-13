@@ -1,0 +1,31 @@
+# AdaGQ-Matter: Co-Optimized Compression and Adaptive Differential Privacy
+# for Federated Anomaly Detection in Smart Home IoT
+# ============================================================
+# Requirements — standalone simulation version (no Flower dependency)
+
+# Core frameworks
+torch>=2.0.0
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Differential Privacy
+opacus>=1.4.0
+
+# Data & Config
+pyyaml>=6.0
+scipy>=1.11.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Experiment tracking
+tqdm>=4.65.0
+json5>=0.9.0
+
+# Optional: HuggingFace datasets (for CICIoT2023 download)
+datasets>=2.14.0
+
+# Optional: GPU acceleration
+# No extra packages needed; PyTorch auto-detects CUDA

@@ -1,0 +1,82 @@
+# ===========================================================
+# AdaGQ-Matter — CPU Lightweight Configuration
+# ===========================================================
+# 4-layer DNN: Input(79)→FC(64,ReLU)→FC(32,ReLU)→FC(16,ReLU)→Output(2)
+# d ≈ 7,762 parameters (含bias), 权重 ≈ 30.6 KB (FP32)
+
+# --- Dataset ---
+dataset: iotid20           # "iotid20" | "ciciot2023" | "both"
+input_dim_iotid20: 79      # IoTID20: 79 numerical features
+input_dim_ciciot2023: 46   # CICIoT2023: 46 features (after preprocessing)
+output_dim: 2              # Binary: normal vs attack
+
+# --- Model ---
+model_type: dnn            # "dnn" | "lstm_ae"
+hidden_dims: [64, 32, 16]  # DNN hidden layer dimensions
+
+# --- FL Training ---
+T: 50                      # Total FL rounds (CPU: 50; GPU: 200)
+N: 10                      # Number of FL clients
+eta: 0.01                  # Learning rate
+E_local: 5                 # Local epochs per round
+batch_size: 32
+alpha: 0.5                 # Dirichlet concentration (Non-IID degree)
+num_seeds: 5               # Number of random seeds for statistical significance
+seed_range: [1, 2, 3, 4, 5]
+
+# --- AdaGQ-Matter Compression ---
+kappa_min: 0.1             # Minimum sparsification ratio
+kappa_max: 0.3             # Maximum sparsification ratio
+kappa_default: 0.2         # Default κ when Gini is moderate
+b_min: 4                   # Minimum bit-width for quantization
+b_max: 8                   # Maximum bit-width
+b_default: 4               # Default bit-width
+gini_threshold_high: 0.7   # Gini > this → κ = kappa_min (highly concentrated)
+gini_threshold_low: 0.4    # Gini < this → κ = kappa_max (diffuse gradient)
+
+# --- Differential Privacy ---
+epsilon: 3.0               # Target privacy budget (ε)
+delta: 1e-5                # Target δ
+dp_noise_multiplier: 1.0   # Noise multiplier σ (will be adapted)
+dp_clipping_norm: 1.0      # Initial clipping norm C(0)
+dp_adaptive_clipping: true # Use adaptive clipping based on gradient norms
+dp_method: rdp             # "rdp" | "gaussian"
+
+# --- Semi-Synchronous Aggregation ---
+W_agg_base_ms: 500         # Base aggregation window (ms)
+tau_threshold_ms: 80       # Latency threshold for window adaptation
+ewma_beta: 0.3             # EWMA smoothing factor for window estimation
+staleness_decay: 0.6       # δ for stale-weighted averaging (δ^s)
+s_max: 3                   # Maximum allowed staleness (rounds)
+packet_loss_rate: 0.05     # Simulated packet loss rate
+latency_mean_ms: 100       # Simulated mean latency
+latency_std_ms: 50         # Simulated latency std
+
+# --- Matter-Aware Feature Grouping ---
+feature_grouping_enabled: true
+fg1_priority_boost: 1.2    # Priority boost for Sensors (FG1)
+fg2_priority_boost: 1.2    # Priority boost for Actuators (FG2)
+fg3_priority_boost: 1.0    # Base priority for Controllers (FG3)
+fg4_priority_boost: 1.0    # Base priority for Network (FG4)
+
+# --- Error Compensation ---
+error_feedback_enabled: true
+error_decay_stale: 0.6     # Same as staleness_decay for stale error buffers
+
+# --- Communication Measurement ---
+measure_communication: true # Record actual bytes transmitted
+
+# --- Attack Evaluation ---
+mia_enabled: true
+dlg_enabled: true
+invgrad_enabled: true
+
+# --- Paths (数据集与代码分离: 数据在 /root/datasets/) ---
+data_dir: /root/datasets/processed
+raw_dir: /root/datasets/raw
+results_dir: results
+figures_dir: results/figures
+
+# --- Hardware ---
+device: cpu                 # "cpu" | "cuda"
+num_workers: 0              # DataLoader workers (0 for CPU, 2 for GPU)

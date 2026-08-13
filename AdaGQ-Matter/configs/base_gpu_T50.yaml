@@ -1,0 +1,76 @@
+# ===========================================================
+# AdaGQ-Matter — GPU Configuration (T=50 快速验证版)
+# ===========================================================
+# 先跑 T=50 验证框架可运行，确认后再跑 T=200
+
+dataset: both               # 两个数据集都跑
+
+# --- FL Training (T=50 快速版) ---
+T: 50                      # 快速验证版 50 轮
+N: 10
+eta: 0.01
+E_local: 5
+batch_size: 64             # GPU 可用更大 batch
+alpha: 0.5
+
+num_seeds: 5
+seed_range: [1, 2, 3, 4, 5]
+
+# --- Model ---
+model_type: dnn
+input_dim_iotid20: 79
+input_dim_ciciot2023: 46
+output_dim: 2
+hidden_dims: [64, 32, 16]
+
+# --- AdaGQ-Matter Compression ---
+kappa_min: 0.1
+kappa_max: 0.3
+kappa_default: 0.2
+b_min: 4
+b_max: 8
+b_default: 4
+gini_threshold_high: 0.7
+gini_threshold_low: 0.4
+
+# --- Differential Privacy ---
+epsilon: 3.0
+delta: 1e-5
+dp_noise_multiplier: 1.0
+dp_clipping_norm: 1.0
+dp_adaptive_clipping: true
+dp_method: rdp
+
+# --- Semi-Synchronous Aggregation ---
+W_agg_base_ms: 500
+tau_threshold_ms: 80
+ewma_beta: 0.3
+staleness_decay: 0.6
+s_max: 3
+packet_loss_rate: 0.05
+latency_mean_ms: 100
+latency_std_ms: 50
+
+# --- Matter-Aware Feature Grouping ---
+feature_grouping_enabled: true
+fg1_priority_boost: 1.2
+fg2_priority_boost: 1.2
+fg3_priority_boost: 1.0
+fg4_priority_boost: 1.0
+
+# --- Error Compensation ---
+error_feedback_enabled: true
+error_decay_stale: 0.6
+
+# --- Communication Measurement ---
+measure_communication: true
+
+# --- Hardware ---
+device: cuda
+num_workers: 2
+
+# --- Paths (数据集与代码分离: 数据在 /root/datasets/) ---
+data_dir: /root/datasets/processed
+raw_dir: /root/datasets/raw
+results_dir: results
+figures_dir: results/figures

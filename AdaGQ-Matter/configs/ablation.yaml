@@ -1,0 +1,72 @@
+# ===========================================================
+# AdaGQ-Matter — Ablation Experiment Configuration
+# ===========================================================
+# Each ablation config disables one component
+
+# Base settings (same as base_cpu)
+dataset: iotid20
+input_dim_iotid20: 79
+output_dim: 2
+model_type: dnn
+hidden_dims: [64, 32, 16]
+T: 50
+N: 10
+eta: 0.01
+E_local: 5
+batch_size: 32
+alpha: 0.5
+device: cpu
+
+# --- Paths (数据集与代码分离) ---
+data_dir: /root/datasets/processed
+raw_dir: /root/datasets/raw
+
+# Ablation configurations — will be overridden per experiment
+ablation_configs:
+  full:
+    description: "Full AdaGQ-Matter (all components active)"
+    kappa_default: 0.2
+    b_default: 4
+    dp_noise_multiplier: 1.0
+    error_feedback_enabled: true
+    feature_grouping_enabled: true
+    dp_adaptive_clipping: true
+    adaptive_window: true
+    shuffling: true
+
+  no_ec:
+    description: "No Error Compensation"
+    error_feedback_enabled: false
+
+  no_quant:
+    description: "No Quantization (κ=0.2, FP32 values only)"
+    b_default: 32           # Effectively no quantization
+
+  no_dp:
+    description: "No Differential Privacy"
+    epsilon: infinity        # No DP noise
+    dp_noise_multiplier: 0.0
+
+  no_adaptive_kappa:
+    description: "No Adaptive κ (fixed κ=0.2)"
+    kappa_min: 0.2
+    kappa_max: 0.2
+    kappa_default: 0.2
+
+  no_adaptive_window:
+    description: "No Adaptive W_agg (fixed 500ms)"
+    adaptive_window: false
+    W_agg_base_ms: 500
+
+  naive_combination:
+    description: "Naive Combination (Top-k + QSGD serial, no co-optimization)"
+    naive_combination: true
+    b_default: 8            # QSGD 8-bit, no coupling with κ
+
+  no_shuffling:
+    description: "No Random Shuffling (no privacy amplification)"
+    shuffling: false
+
+  no_feature_grouping:
+    description: "No Matter-Aware Feature Grouping"
+    feature_grouping_enabled: false
